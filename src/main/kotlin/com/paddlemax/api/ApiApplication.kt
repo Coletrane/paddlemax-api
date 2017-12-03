@@ -6,9 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 
-@SpringBootApplication
 // TODO: set up data source
-@EnableAutoConfiguration(exclude = arrayOf(DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class))
+//@EnableAutoConfiguration(exclude = arrayOf(DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class))
+@SpringBootApplication
 class ApiApplication
 
 fun main(args: Array<String>) {

@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		kotlinVersion = '1.1.61'
+		kotlinVersion = '1.2.0'
 		springBootVersion = '1.5.9.RELEASE'
 	}
 	repositories {
@@ -40,6 +40,11 @@ dependencies {
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 	compile(group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.9.2')
+	compile(group: 'postgresql', name: 'postgresql', version: '9.1-901-1.jdbc4')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.security:spring-security-test')
+}
+
+springBoot {
+	executable = true
 }
