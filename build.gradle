@@ -1,3 +1,17 @@
+// Load DB config
+String propsLocation = "/lib/max/application.properties"
+Properties props = new Properties()
+InputStream stream
+try {
+	stream = new FileInputStream(propsLocation)
+	props.load(stream)
+	stream.close()
+} catch(FileNotFoundException e){
+	println("No configuration found in " +
+			propsLocation +
+			" Assuming we're in dev mode")
+}
+
 buildscript {
 	ext {
 		kotlinVersion = '1.2.0'
@@ -10,7 +24,9 @@ buildscript {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 		classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
 		classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
-		classpath "org.jetbrains.kotlin:kotlin-noarg:${kotlinVersion}"
+		classpath("org.jetbrains.kotlin:kotlin-noarg:${kotlinVersion}")
+		classpath("org.liquibase:liquibase-gradle-plugin:1.2.4")
+
 	}
 }
 
@@ -19,6 +35,8 @@ apply plugin: 'kotlin-spring'
 apply plugin: "kotlin-jpa"
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'org.liquibase.gradle'
+apply plugin: 'liquibase'
 
 group = 'com.paddlemax'
 version = '0.0.1-SNAPSHOT'
@@ -43,11 +61,37 @@ dependencies {
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 	compile(group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.9.2')
 	compile(group: 'postgresql', name: 'postgresql', version: '9.1-901-1.jdbc4')
+ 	compile(group: 'com.fasterxml.jackson.module', name: 'jackson-modules-java8', version: '2.9.2', ext: 'pom')
+	compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.4.0")
+	compile(group: 'org.yaml', name: 'snakeyaml', version: '1.19')
+	testCompile(group: 'com.h2database', name: 'h2', version: '1.4.196')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
 	testCompile('org.springframework.security:spring-security-test')
 }
 
 springBoot {
 	executable = true
+}
+
+liquibase {
+	activities {
+		main {
+			changeLogFile 'changelog.json'
+			url props.getProperty("spring.datasource.url")
+			username props.getProperty("spring.datasource.username")
+			password props.get("spring.datasource.password")
+		}
+		second {
+			changeLogFile 'changelog.json'
+			url props.getProperty("spring.datasource.url")
+			username props.getProperty("spring.datasource.username")
+			password props.get("spring.datasource.password")
+		}
+	}
+
+	// runList = project.ext.runList
+	// runList = 'main'
+	runList = 'main, second'
 }
 

@@ -6,4 +6,9 @@ import javax.transaction.Transactional
 
 @Repository
 @Transactional
-interface UserRepository: JpaRepository<User, Long>
+interface UserRepository: JpaRepository<User, Long> {
+
+    fun findById(id: Long): User?
+
+    fun findByEmail(email: String): User?
+}
