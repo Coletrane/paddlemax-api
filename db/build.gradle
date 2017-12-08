@@ -54,15 +54,18 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-liquibase {
-    activities {
-        main {
-            changeLogFile changelogLocation
-            url props.getProperty("spring.datasource.url")
-            username props.getProperty("spring.datasource.username")
-            password props.get("spring.datasource.password")
+task('buildSchema') << {
+    println 'Building Schema: ' +
+            'Changelog Location: ' + changelogLocation
+    liquibase {
+        activities {
+            main {
+                changeLogFile changelogLocation
+                url props.getProperty("spring.datasource.url")
+                username props.getProperty("spring.datasource.username")
+                password props.get("spring.datasource.password")
+            }
         }
     }
 }
-
 
