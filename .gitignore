@@ -25,4 +25,7 @@ nbdist/
 .nb-gradle/
 
 .DS_Store
-config/
+
+dev.yml
+prod.yml
+paddlemax.jks

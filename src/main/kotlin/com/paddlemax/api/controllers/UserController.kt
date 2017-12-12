@@ -1,13 +1,14 @@
 package com.paddlemax.api.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.module.kotlin.*
 import com.paddlemax.api.db.user.User
 import com.paddlemax.api.db.user.UserService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.lang.Long.parseLong
 import java.net.URI
@@ -24,26 +25,26 @@ class UserController(
         val log = LoggerFactory.getLogger(UserController::class.java)
     }
 
+//    @PreAuthorize("#oauth2.hasScope('read')")
     @GetMapping(
         "/{id}",
-        produces = arrayOf("application/json"))
+        produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun getUser(@PathVariable("id") id: String): ResponseEntity<String> {
 
-        log.debug("GET user $id")
+        log.info("GET user $id")
 
         val response: ResponseEntity<String>
 
-        println("PARSE LONG ${parseLong(id)}")
         val user = userService.findById(id.toLong())
         if (user != null) {
-            log.debug("Responding with user ${mapper
+            log.info("Responding with user ${mapper
                 .writerWithDefaultPrettyPrinter()
                 .writeValueAsString(user)}")
 
             response = ResponseEntity
                 .ok(mapper.writeValueAsString(user))
         } else {
-            log.debug("No user found with ID: ${id}\"")
+            log.info("No user found with ID: ${id}\"")
             response = ResponseEntity
                 .notFound()
                 .build()
@@ -53,12 +54,11 @@ class UserController(
     }
 
     @PostMapping(
-        "/",
-        consumes = arrayOf("application/json"),
-        produces = arrayOf("application/json"))
+        consumes = arrayOf(MediaType.APPLICATION_JSON_VALUE),
+        produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun createUser(@RequestBody user: User): ResponseEntity<String> {
 
-        log.debug("POST user ${mapper
+        log.info("POST user ${mapper
             .writerWithDefaultPrettyPrinter()
             .writeValueAsString(user)}")
 
@@ -74,14 +74,14 @@ class UserController(
         val newUser = userService.save(user)
 
         if (newUser != null) {
-            log.debug("Saving of user: ${userInfo(newUser)} was successful")
+            log.info("Saving of user: ${userInfo(newUser)} was successful")
             // Returning this so the clients can get the new user ID
             response = ResponseEntity
                 .created(URI("/user/${newUser.id}"))
                 .build()
         } else {
             val errStr = "User ${userInfo(newUser)} already exists"
-            log.debug(errStr)
+            log.info(errStr)
             response = ResponseEntity
                 .badRequest()
                 .body(errStr)
@@ -91,12 +91,11 @@ class UserController(
     }
 
     @PutMapping(
-        "/",
-        consumes = arrayOf("application/json"),
-        produces = arrayOf("application/json"))
+        consumes = arrayOf(MediaType.APPLICATION_JSON_VALUE),
+        produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
     fun updateUser(@RequestBody partialUserInfo: User): ResponseEntity<String> {
 
-        log.debug("PUT user ${mapper
+        log.info("PUT user ${mapper
             .writerWithDefaultPrettyPrinter()
             .writeValueAsString(partialUserInfo)}")
 
@@ -106,7 +105,7 @@ class UserController(
         val persistentUser = userService.findByEmail(partialUserInfo.email)
 
         if (persistentUser != null) {
-            log.debug("Found user ${userInfo(persistentUser)}")
+            log.info("Found user ${userInfo(persistentUser)}")
             // Make a new user with the id from the user we just got
             val userToUpdate = User(
                 persistentUser.id,
@@ -120,7 +119,7 @@ class UserController(
 
             val updatedUser = userService.save(userToUpdate)
 
-            log.debug("Updating of user: ${userInfo(updatedUser)} was successful")
+            log.info("Updating of user: ${userInfo(updatedUser)} was successful")
             response = ResponseEntity
                 .ok(mapper.writeValueAsString(updatedUser))
 
