@@ -44,7 +44,7 @@ repositories {
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-web')
-	compile(group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.0.RELEASE')
+//	compile(group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.0.RELEASE')
 	compile('org.springframework.boot:spring-boot-starter-security')
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
@@ -54,7 +54,7 @@ dependencies {
 	compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.4.0")
 	compile(group: 'com.h2database', name: 'h2', version: '1.4.196')
 	compile group: 'org.yaml', name: 'snakeyaml', version: '1.19'
-	compile(group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.2.1.RELEASE')
+//	compile(group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.2.1.RELEASE')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
 	testCompile('org.springframework.security:spring-security-test')

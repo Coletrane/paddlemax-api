@@ -5,7 +5,7 @@ import javax.transaction.Transactional
 
 @Service
 @Transactional
-class UserServiceImpl(
+class  UserServiceImpl(
     val userRepo: UserRepository
 ): UserService {
 

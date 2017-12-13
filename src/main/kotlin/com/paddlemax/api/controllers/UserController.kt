@@ -6,26 +6,33 @@ import com.paddlemax.api.db.user.UserService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.lang.Long.parseLong
 import java.net.URI
+import javax.print.attribute.standard.Media
+import javax.servlet.http.HttpServletRequest
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/user")
 class UserController(
     @Autowired
-    private var userService: UserService,
+    private var userService: UserService) {
+
     @Autowired
-    private var mapper: ObjectMapper) {
+    private lateinit var mapper: ObjectMapper
+
+    @Autowired
+    private lateinit var eventPublisher: ApplicationEventPublisher
 
     private companion object {
         val log = LoggerFactory.getLogger(UserController::class.java)
     }
 
-//    @PreAuthorize("#oauth2.hasScope('read')")
     @GetMapping(
         "/{id}",
         produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
@@ -53,41 +60,38 @@ class UserController(
         return response
     }
 
-    @PostMapping(
+    @PostMapping("/register",
         consumes = arrayOf(MediaType.APPLICATION_JSON_VALUE),
         produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-    fun createUser(@RequestBody user: User): ResponseEntity<String> {
+    fun register(
+        @Valid user: User,
+        req: HttpServletRequest): ResponseEntity<String> {
 
         log.info("POST user ${mapper
             .writerWithDefaultPrettyPrinter()
             .writeValueAsString(user)}")
 
-        // Short circut if the ID already exists
-        if (userService.findByEmail(user.email) != null) {
-            return ResponseEntity
-                .badRequest()
-                .body("User already exists")
-        }
+        checkUserExists(user)
 
-        val response: ResponseEntity<String>
-
+        val res: ResponseEntity<String>
         val newUser = userService.save(user)
 
         if (newUser != null) {
             log.info("Saving of user: ${userInfo(newUser)} was successful")
             // Returning this so the clients can get the new user ID
-            response = ResponseEntity
+            res = ResponseEntity
                 .created(URI("/user/${newUser.id}"))
                 .build()
         } else {
             val errStr = "User ${userInfo(newUser)} already exists"
             log.info(errStr)
-            response = ResponseEntity
+            res = ResponseEntity
                 .badRequest()
                 .body(errStr)
         }
 
-        return response
+//        eventPublisher.publishEvent(OnRegistrationCompleteEvent(newUser, req.locale))
+        return res
     }
 
     @PutMapping(
@@ -137,4 +141,16 @@ class UserController(
         return "${user.firstName} ${user.lastName} with ID: ${user.id}"
     }
 
+    private fun checkUserExists(user: User): ResponseEntity<String>? {
+
+        var res: ResponseEntity<String>? = null
+
+        if (userService.findByEmail(user.email) != null) {
+            res = ResponseEntity
+                .badRequest()
+                .body("User already exists")
+        }
+
+        return res
+    }
 }

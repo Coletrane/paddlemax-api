@@ -21,6 +21,7 @@ import java.time.LocalDate
 import javax.transaction.Transactional
 import com.paddlemax.api.config.JacksonConfig
 import org.junit.Assert.assertNotNull
+import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.support.AnnotationConfigContextLoader
 
@@ -66,8 +67,7 @@ class UserControllerTest {
     fun setUp() {
         userService = UserServiceImpl(userRepo)
         userController = UserController(
-            userService,
-            mapper)
+            userService)
 
         // Set up test users
         cole = userService.save(User(
@@ -110,20 +110,20 @@ class UserControllerTest {
 
     @Test
     fun createUserUserDoesNotExist() {
-        val res = userController.createUser(notInDb)
+        val res = userController.register(notInDb, MockHttpServletRequest())
         assertEquals(HttpStatus.CREATED, res.statusCode)
     }
 
     @Test
     fun createUserUserDoesExist() {
-        val res = userController.createUser(cole)
+        val res = userController.register(cole, MockHttpServletRequest())
         assertEquals(HttpStatus.BAD_REQUEST, res.statusCode)
     }
 
     @Test
     fun createUserWithJsonDate() {
         val user = mapper.readValue<User>(notInDbJson)
-        val res = userController.createUser(user)
+        val res = userController.register(user, MockHttpServletRequest())
         assertEquals(HttpStatus.CREATED, res.statusCode)
     }
 

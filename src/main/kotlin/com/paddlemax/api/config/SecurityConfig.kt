@@ -1,8 +1,11 @@
+package com.paddlemax.api.config
+
 import com.paddlemax.api.config.AuthEntryPoint
 import com.paddlemax.api.config.AuthSuccessHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.security.SecurityProperties
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.security.authentication.AuthenticationManager
@@ -12,12 +15,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
-import org.bouncycastle.cms.RecipientId.password
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 
 @Configuration
 @EnableWebSecurity
+@ComponentScan
 class SecurityConfig: WebSecurityConfigurerAdapter() {
 
     @Autowired
@@ -34,23 +39,24 @@ class SecurityConfig: WebSecurityConfigurerAdapter() {
 //    }
 
     override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.jdbcAuthentication()
+        auth.inMemoryAuthentication()
     }
 
     override fun configure(http: HttpSecurity) {
         http
             .csrf().disable()
-            .exceptionHandling()
-            .authenticationEntryPoint(authEntry)
-            .and()
             .authorizeRequests()
-            .antMatchers("/**").authenticated()
+            .antMatchers(
+                "/user/register").permitAll()
+            .anyRequest().authenticated()
             .and()
-            .formLogin()
-            .successHandler(authSuccessHandler)
-            .failureHandler(SimpleUrlAuthenticationFailureHandler())
-            .and()
-            .logout()
+            .httpBasic()
+            .authenticationEntryPoint(authEntry)
+    }
+
+    @Bean
+    fun encoder(): PasswordEncoder {
+        return BCryptPasswordEncoder(11)
     }
 
     @Bean
