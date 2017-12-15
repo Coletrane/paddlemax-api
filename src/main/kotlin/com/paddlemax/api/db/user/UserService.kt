@@ -6,7 +6,9 @@ interface UserService {
 
     fun findByEmail(email: String): User?
 
-    fun save(user: User): User
+    fun register(user: User): User?
+
+    fun update(user: User): User?
 
     fun delete(id: Long)
 }

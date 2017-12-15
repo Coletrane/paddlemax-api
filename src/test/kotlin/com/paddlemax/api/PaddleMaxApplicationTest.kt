@@ -14,11 +14,13 @@ import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.core.env.Environment
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.jdbc.datasource.init.DatabasePopulator
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.util.Base64Utils
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(
@@ -34,20 +36,31 @@ class PaddleMaxApplicationTest {
     private lateinit var mvc: MockMvc
 
     private companion object {
-        val username = "cole"
+        val email = "eloc49@gmail.com"
         val password = "assword"
+        // Mmmm look at that sweet, sweet string interpolation
+        val authHeaderVal = "Basic ${Base64Utils.encodeToString("${email}:${password}".toByteArray())}"
+
         val coleJson = """
             {
                 "firstName": "cole",
                 "lastName": "inman",
-                "email": "eloc49@gmail.com"
+                "email": "${email}",
+                "password": "${password}"
             }
+        """
 
+        val updateJson = """
+            {
+                "firstName": "art",
+                "lastName": "blakey",
+                "email": "${email}"
+            }
         """
     }
 
     @Test
-    fun notAuthorizedInvalidHttpMethod() {
+    fun notAuthorized() {
         mvc.perform(
             post("/user")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -57,11 +70,23 @@ class PaddleMaxApplicationTest {
     }
 
     @Test
-    fun notAuthorizedValidHttpMethod() {
+    fun authorized() {
         mvc.perform(
-            get("/user/1")
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(coleJson)
                 .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isUnauthorized)
+            .andExpect(status().isCreated)
+
+        mvc.perform(
+            put("/user")
+                .header(
+                    HttpHeaders.AUTHORIZATION,
+                    authHeaderVal)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateJson)
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk)
     }
 }
 

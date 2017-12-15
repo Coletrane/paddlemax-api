@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -19,6 +20,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import javax.sql.DataSource
 
 @Configuration
 @EnableWebSecurity
@@ -31,15 +33,14 @@ class SecurityConfig: WebSecurityConfigurerAdapter() {
     @Autowired
     private lateinit var authSuccessHandler: AuthSuccessHandler
 
-//    @Bean
-//    public override fun userDetailsService(): UserDetailsService {
-//        val manager = InMemoryUserDetailsManager()
-//        manager.createUser(User.withDefaultPasswordEncoder().username("user").password("password").roles("USER").build())
-//        return manager
-//    }
+    @Autowired
+    private lateinit var dataSource: DataSource
+
+    @Autowired
+    private lateinit var userDetailsServ: CustomUserDetailsService
 
     override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.inMemoryAuthentication()
+        auth.authenticationProvider(authProvider())
     }
 
     override fun configure(http: HttpSecurity) {
@@ -51,9 +52,17 @@ class SecurityConfig: WebSecurityConfigurerAdapter() {
             .anyRequest().authenticated()
             .and()
             .httpBasic()
-            .authenticationEntryPoint(authEntry)
+//            .authenticationEntryPoint(authEntry)
     }
 
+    @Bean
+    fun authProvider(): DaoAuthenticationProvider {
+        val authProvider = DaoAuthenticationProvider()
+        authProvider.setUserDetailsService(userDetailsServ)
+        authProvider.setPasswordEncoder(encoder())
+
+        return authProvider
+    }
     @Bean
     fun encoder(): PasswordEncoder {
         return BCryptPasswordEncoder(11)
