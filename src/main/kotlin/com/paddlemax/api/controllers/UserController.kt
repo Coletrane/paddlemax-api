@@ -8,12 +8,16 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.util.Base64Utils
 import org.springframework.web.bind.annotation.*
 import java.lang.Long.parseLong
 import java.net.URI
+import java.nio.charset.Charset
+import java.util.*
 import javax.print.attribute.standard.Media
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
@@ -35,33 +39,49 @@ class UserController {
         val log = LoggerFactory.getLogger(UserController::class.java)
     }
 
-    // TODO: change to /me endpoint
-//    @GetMapping(
-//        "/{id}",
-//        produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
-//    fun getUser(@PathVariable("id") id: String): ResponseEntity<String> {
-//
-//        log.info("GET user $id")
-//
-//        val response: ResponseEntity<String>
-//
-//        val user = userService.findById(id.toLong())
-//        if (user != null) {
-//            log.info("Responding with user ${mapper
-//                .writerWithDefaultPrettyPrinter()
-//                .writeValueAsString(user)}")
-//
-//            response = ResponseEntity
-//                .ok(mapper.writeValueAsString(user))
-//        } else {
-//            log.info("No user found with ID: ${id}\"")
-//            response = ResponseEntity
-//                .notFound()
-//                .build()
-//        }
-//
-//        return response
-//    }
+    @GetMapping(
+        "/me",
+        produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    fun getUser(req: HttpServletRequest): ResponseEntity<String> {
+
+        val base64Credentials =
+            req.getHeader(HttpHeaders.AUTHORIZATION)
+                .substring("Basic".length)
+                    .trim()
+
+        val credentials =
+            String(
+                Base64.getDecoder().decode(base64Credentials),
+                Charset.forName("UTF-8"))
+                .split(":")
+
+        val email = credentials[0]
+
+        log.info("GET user with email: $email")
+
+        val response: ResponseEntity<String>
+
+        val user = userService.findByEmail(email)
+        if (user != null) {
+
+            val userNoPw = User(user, null)
+
+            log.info("Responding with user ${mapper
+                .writerWithDefaultPrettyPrinter()
+                .writeValueAsString(userNoPw)}")
+
+            response = ResponseEntity
+                .ok(mapper.writeValueAsString(userNoPw))
+        } else {
+            // I think this is unreachable because of auth
+            log.info("No user found with email: $email")
+            response = ResponseEntity
+                .notFound()
+                .build()
+        }
+
+        return response
+    }
 
     @PostMapping("/register",
         consumes = arrayOf(MediaType.APPLICATION_JSON_VALUE),

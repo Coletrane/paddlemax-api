@@ -23,9 +23,6 @@ class CustomUserDetailsService : UserDetailsService {
     @Autowired
     private lateinit var req: HttpServletRequest
 
-//    @Autowired
-//    private lateinit var loginAttemptServ: LoginAttemptService
-
     override fun loadUserByUsername(email: String): UserDetails {
 
         var userDetails: org.springframework.security.core.userdetails.User

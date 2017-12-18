@@ -23,9 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.util.Base64Utils
 
 @RunWith(SpringRunner::class)
-@SpringBootTest(
-    classes = arrayOf(PaddleMaxApplication::class),
-    webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 class PaddleMaxApplicationTest {
 
@@ -35,11 +33,14 @@ class PaddleMaxApplicationTest {
     @Autowired
     private lateinit var mvc: MockMvc
 
-    private companion object {
+    companion object {
         val email = "eloc49@gmail.com"
         val password = "assword"
+
         // Mmmm look at that sweet, sweet string interpolation
-        val authHeaderVal = "Basic ${Base64Utils.encodeToString("${email}:${password}".toByteArray())}"
+        fun authHeaderVal(email: String, password: String?): String {
+            return "Basic ${Base64Utils.encodeToString("${email}:${password}".toByteArray())}"
+        }
 
         val coleJson = """
             {
@@ -82,7 +83,7 @@ class PaddleMaxApplicationTest {
             put("/user")
                 .header(
                     HttpHeaders.AUTHORIZATION,
-                    authHeaderVal)
+                    authHeaderVal(email, password))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJson)
                 .accept(MediaType.APPLICATION_JSON))

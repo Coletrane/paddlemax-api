@@ -24,24 +24,6 @@ data class User (
     @Column(nullable = false)
     val password: String?,
 
-//    val enabled: Boolean,
-//
-//    @ManyToMany(fetch = FetchType.EAGER)
-//    @JoinTable(
-//        name = "app_user_roles",
-//        joinColumns = arrayOf(
-//            JoinColumn(
-//                name = "user_id",
-//                referencedColumnName = "id")
-//        ),
-//        inverseJoinColumns = arrayOf(
-//            JoinColumn(
-//                name = "role_id",
-//                referencedColumnName = "id")
-//        )
-//    )
-//    val roles: Array<Role>,
-
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     val birthday: LocalDate?,
@@ -56,8 +38,7 @@ data class User (
         firstName: String,
         lastName: String,
         email: String,
-        password: String
-        ): this(
+        password: String): this(
             id,
             firstName,
             lastName,
@@ -67,4 +48,26 @@ data class User (
             null,
             null
         )
+
+    constructor(user: User): this(
+        user.id,
+        user.firstName,
+        user.lastName,
+        user.email,
+        user.password,
+        user.birthday,
+        user.weightLbs,
+        user.location
+    )
+
+    constructor(user: User, password: String?): this(
+        user.id,
+        user.firstName,
+        user.lastName,
+        user.email,
+        password,
+        user.birthday,
+        user.weightLbs,
+        user.location
+    )
 }

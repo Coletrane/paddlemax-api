@@ -26,6 +26,6 @@ nbdist/
 
 .DS_Store
 
-dev.yml
-prod.yml
-paddlemax.jks
+src/main/resources/dev.yml
+src/main/resources/prod.yml
+src/main/resources/paddlemax.jks

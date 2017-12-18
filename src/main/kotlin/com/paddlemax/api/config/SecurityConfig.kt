@@ -20,7 +20,6 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import javax.sql.DataSource
 
 @Configuration
 @EnableWebSecurity
@@ -32,9 +31,6 @@ class SecurityConfig: WebSecurityConfigurerAdapter() {
 
     @Autowired
     private lateinit var authSuccessHandler: AuthSuccessHandler
-
-    @Autowired
-    private lateinit var dataSource: DataSource
 
     @Autowired
     private lateinit var userDetailsServ: CustomUserDetailsService
@@ -52,7 +48,6 @@ class SecurityConfig: WebSecurityConfigurerAdapter() {
             .anyRequest().authenticated()
             .and()
             .httpBasic()
-//            .authenticationEntryPoint(authEntry)
     }
 
     @Bean
