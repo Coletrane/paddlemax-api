@@ -1,7 +1,5 @@
 package com.paddlemax.api.config
 
-import com.paddlemax.api.config.AuthEntryPoint
-import com.paddlemax.api.config.AuthSuccessHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.security.SecurityProperties
 import org.springframework.context.annotation.Bean
@@ -25,12 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 @EnableWebSecurity
 @ComponentScan
 class SecurityConfig: WebSecurityConfigurerAdapter() {
-
-    @Autowired
-    private lateinit var authEntry: AuthEntryPoint
-
-    @Autowired
-    private lateinit var authSuccessHandler: AuthSuccessHandler
 
     @Autowired
     private lateinit var userDetailsServ: CustomUserDetailsService
@@ -61,16 +53,5 @@ class SecurityConfig: WebSecurityConfigurerAdapter() {
     @Bean
     fun encoder(): PasswordEncoder {
         return BCryptPasswordEncoder(11)
-    }
-
-    @Bean
-    fun mySuccessHandler(): AuthSuccessHandler {
-        return AuthSuccessHandler()
-    }
-
-    // TODO: implement failure handler
-    @Bean
-    fun myFailureHandler(): SimpleUrlAuthenticationFailureHandler {
-        return SimpleUrlAuthenticationFailureHandler()
     }
 }
