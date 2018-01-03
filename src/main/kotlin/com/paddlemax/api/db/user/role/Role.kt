@@ -1,6 +1,8 @@
 package com.paddlemax.api.db.user.role
 
-import javax.persistence.*
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
 
 data class Role(
 

@@ -1,8 +1,6 @@
 package com.paddlemax.api.db.user
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import com.paddlemax.api.db.user.role.Role
-import com.paddlemax.api.db.user.role.RoleEnum
 import java.time.LocalDate
 import javax.persistence.*
 

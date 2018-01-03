@@ -3,24 +3,17 @@ package com.paddlemax.api.controllers
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.paddlemax.api.db.user.User
 import com.paddlemax.api.db.user.UserService
-import com.paddlemax.api.db.user.UserServiceImpl
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.util.Base64Utils
 import org.springframework.web.bind.annotation.*
-import java.lang.Long.parseLong
 import java.net.URI
 import java.nio.charset.Charset
 import java.util.*
-import javax.print.attribute.standard.Media
 import javax.servlet.http.HttpServletRequest
-import javax.validation.Valid
 
 @RestController
 @RequestMapping("/user")

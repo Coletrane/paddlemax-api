@@ -1,36 +1,28 @@
 package com.paddlemax.api.controllers
 
-import com.fasterxml.jackson.module.kotlin.*
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.paddlemax.api.PaddleMaxApplicationTest
+import com.paddlemax.api.config.JacksonConfig
 import com.paddlemax.api.db.user.User
 import com.paddlemax.api.db.user.UserRepository
 import com.paddlemax.api.db.user.UserService
-import com.paddlemax.api.db.user.UserServiceImpl
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpStatus
-import org.springframework.test.context.junit4.SpringRunner
-import java.net.URI
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import java.time.LocalDate
-import javax.transaction.Transactional
-import com.paddlemax.api.config.JacksonConfig
-import org.junit.Assert.*
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletRequest
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.support.AnnotationConfigContextLoader
+import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDate
+import javax.transaction.Transactional
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
