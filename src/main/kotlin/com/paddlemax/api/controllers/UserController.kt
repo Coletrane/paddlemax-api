@@ -16,7 +16,7 @@ import java.util.*
 import javax.servlet.http.HttpServletRequest
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/v1/user")
 class UserController {
 
     @Autowired

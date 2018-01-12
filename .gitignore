@@ -29,3 +29,4 @@ nbdist/
 src/main/resources/dev.yml
 src/main/resources/prod.yml
 src/main/resources/paddlemax.jks
+src/main/resources/auth0.properties
