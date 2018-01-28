@@ -15,7 +15,7 @@ const prod = process.env.NODE_ENV === "production"
 // DB setup is done by .sequelizerc and config/db.js
 const app = express()
 app.use(cors())
-app.user(bodyParser.json())
+app.use(bodyParser.json())
 
 // Models and routes
 require('./models/User')
