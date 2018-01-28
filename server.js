@@ -5,10 +5,12 @@ const express = require("express")
 const cors = require("cors")
 const errorhandler = require("errorhandler")
 const bodyParser = require('body-parser')
+const jwt = require('express-jwt')
+
 
 // Config
-require("dotenv").config
-const dbConfig = require("./config/db")
+require("dotenv").config()
+const config = require('./config')
 const prod = process.env.NODE_ENV === "production"
 
 // App setup
@@ -16,6 +18,13 @@ const prod = process.env.NODE_ENV === "production"
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
+
+// Set up auth
+if ( !process.env.AUTH0_DOMAIN
+  || !process.env.AUTH0_AUDIENCE) {
+  throw "Set AUTH0_DOMAIN, and AUTH0_AUDIENCE in .env!"
+}
+app.use(config.jwt)
 
 // Models and routes
 require('./models/User')
