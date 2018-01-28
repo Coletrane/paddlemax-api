@@ -24,11 +24,10 @@ if ( !process.env.AUTH0_DOMAIN
   || !process.env.AUTH0_AUDIENCE) {
   throw "Set AUTH0_DOMAIN, and AUTH0_AUDIENCE in .env!"
 }
-app.use(config.jwt)
 
 // Models and routes
 require('./models/User')
-require('./routes')
+app.use(require('./routes'))
 
 
 // Error handlers

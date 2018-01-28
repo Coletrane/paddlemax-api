@@ -5,6 +5,9 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     location: DataTypes.STRING,
     weightLbs: DataTypes.INTEGER,
-    birthday: DataTypes.DATE
+    birthday: DataTypes.DATE,
+    facebookId: DataTypes.STRING,
+    facebookAuthToken: DataTypes.STRING,
+    googleId: DataTypes.STRING
   })
 }
