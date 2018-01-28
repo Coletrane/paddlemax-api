@@ -3,7 +3,6 @@ const request = require('supertest')
 const user = require('../models/User')
 
 const testUserValid = {
-  email: "artblakey@finessinyolady.com",
   facebookAuthToken: "123456789"
 }
 
@@ -17,8 +16,8 @@ describe('User', () => {
       it('should be authorized', (done) => {
         request(server)
           .post('/v1/user/login')
-          .send('user', testUserValid)
-          .expect(200, done)
+          .send('user', JSON.stringify({email: "artblakey@finessinyolady.com"}))
+          .expect(400, done)
       })
     })
 })

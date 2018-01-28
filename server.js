@@ -6,7 +6,9 @@ const cors = require("cors")
 const errorhandler = require("errorhandler")
 const bodyParser = require('body-parser')
 const jwt = require('express-jwt')
-
+const passport = require('passport')
+const FacebookTokenStrategy = require('passport-facebook-token')
+const models = require('./models')
 
 // Config
 require("dotenv").config()
@@ -19,14 +21,20 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 
-// Set up auth
-if ( !process.env.AUTH0_DOMAIN
-  || !process.env.AUTH0_AUDIENCE) {
-  throw "Set AUTH0_DOMAIN, and AUTH0_AUDIENCE in .env!"
-}
+// Set up passport
+passport.use(new FacebookTokenStrategy({
+  clientID: process.env.FACEBOOK_APP_ID,
+  clientSecret: process.env.FACEBOOK_APP_SECRET
+  }, (accessToken, refreshToken, profile, done) => {
+    models.User.findOrCreate({facebookId: profile.id}, (err, user) => {
+      return done(error, user)
+    })
+  }
+))
+app.use(passport.initialize())
+app.use(passport.session())
 
-// Models and routes
-require('./models/User')
+// Set up routes
 app.use(require('./routes'))
 
 
