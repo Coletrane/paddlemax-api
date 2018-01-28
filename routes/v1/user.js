@@ -7,12 +7,18 @@ const readAndUpdate = jwtAuthz([
   'update:user'
 ])
 
-router.post('/users/login', readAndUpdate, (req, res, next) => {
+router.post('/user/login', (req, res, next) => {
   if (!req.body.user.email) {
     return res.status(401)
   }
 
 
+
+
+})
+
+router.get('/user/me', readAndUpdate, (req, res, next) => {
+  return 1
 })
 
 module.exports = router

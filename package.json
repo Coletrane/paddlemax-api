@@ -4,8 +4,8 @@
   "description": "API for PaddleMax iOS, Android, and Webapp",
   "main": "server.js",
   "scripts": {
-    "start": "node ./server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "NODE_ENV=production node ./server.js",
+    "test": "NODE_ENV=test babel-tape-runner test/*.spec.js"
   },
   "repository": {
     "type": "git",
@@ -28,5 +28,11 @@
     "jwks-rsa": "^1.2.1",
     "lodash": "^4.17.4",
     "sequelize": "^4.32.2"
+  },
+  "devDependencies": {
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-tape-runner": "^2.0.1",
+    "supertest": "^3.0.0",
+    "tape": "^4.8.0"
   }
 }

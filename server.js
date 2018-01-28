@@ -60,6 +60,8 @@ if (prod) {
   })
 }
 
+module.exports = app
+
 // Start server
 const server = app.listen(process.env.PORT || 3000, () => {
   console.log('PaddleMax API listening on port ' + server.address().port)
