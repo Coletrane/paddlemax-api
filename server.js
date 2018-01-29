@@ -22,28 +22,28 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 
-// Set up passport
-passport.use(new FacebookTokenStrategy({
-  clientID: process.env.FACEBOOK_APP_ID,
-  clientSecret: process.env.FACEBOOK_APP_SECRET
-  }, (accessToken, refreshToken, profile, done) => {
-    let user = models.User.findAll({
-      where: {
-        [Op.or]: [
-          {
-            facebookId: profile.id
-          },
-          {
-            email: profile.email
-          }
-        ]
-      }
-    })
-    return done(error, user)
-  }
-))
-app.use(passport.initialize())
-app.use(passport.session())
+// // Set up passport
+// passport.use(new FacebookTokenStrategy({
+//   clientID: process.env.FACEBOOK_APP_ID,
+//   clientSecret: process.env.FACEBOOK_APP_SECRET
+//   }, (accessToken, refreshToken, profile, done) => {
+//     let user = models.User.findAll({
+//       where: {
+//         [Op.or]: [
+//           {
+//             facebookId: profile.id
+//           },
+//           {
+//             email: profile.email
+//           }
+//         ]
+//       }
+//     })
+//     return done(error, user)
+//   }
+// ))
+// app.use(passport.initialize())
+// app.use(passport.session())
 
 // Set up routes
 app.use(require('./routes'))
