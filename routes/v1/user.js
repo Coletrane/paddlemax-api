@@ -21,11 +21,6 @@ router.post("/user/login", (req, res, next) => {
     let fbReqUrl = buildFacebookUrl(req.body)
     request
       .get(fbReqUrl, async (err, response, body) => {   // important to name that 'response' so to not clash with the name in the scope above this one
-        if (err) {
-          res.status(400)
-          res.send("Error querying facebook API")
-        } else {
-          console.log(body)
           const fbUser = JSON.parse(body)
           if (fbUser.id) {
             const existingUser = await User.findOne({
@@ -51,8 +46,12 @@ router.post("/user/login", (req, res, next) => {
             res.status(200)
             res.send(newUser)
           }
-        }
       })
+      .catch((err) => {
+        res.status(err.statusCode)
+        res.send("Error querying Facebook API")
+      })
+
   } else if (req.body.googleAuthToken) {
 
   } else {
@@ -77,9 +76,7 @@ const buildFacebookUrl = (user) => {
 }
 
 router.get("/user/me", config.jwt, async (req, res, next) => {
-  if (!req.email) {
-    res.status(400).send("Email is required")
-  }
+  console.log(req)
 
   const user = await User.findOne({
     where: {
@@ -93,6 +90,15 @@ router.get("/user/me", config.jwt, async (req, res, next) => {
     res.status(404)
     res.send()
   }
+})
+
+router.patch("/user", (req, res, next) => {
+  if (!req.body.email) {
+    res.status(400)
+    res.send("Email is required")
+  }
+
+
 })
 
 module.exports = router

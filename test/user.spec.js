@@ -7,13 +7,12 @@ require('dotenv').config()
 
 const route = '/v1/user'
 const facebookTestUsersUrl = `${process.env.FACEBOOK_APP_ID}/accounts/test-users`
-const testFacebookUser = {
-  facebookAuthToken: "EAAC5ZAV6cpyIBAHmSiZC6IvceD1JDgYSfS4ThD2Hzlo7IWUry8oOPGPzm4ZBpbJRnSoghGOHHzHZAECF5cm6zwwxIcqQ9ZAsilrhTwZAk63WavoqxXs6uGL2iGqJOrlFrXrJACrGh5eM4jvgZAhgc4F5QwRZCOv4n8gJeS6IppAWIPXiUz7zhABD4ZAxhw0ZCMegesPZAZB2SWdHYgvwGrxZA4fZBm",
+let testUsers
+const buddyRich = {
   email: "uzqgctllms_1517190488@tfbnw.net",
-  firstName: "Buddy",
-  lastName: "Rich",
-  birthday: "02/06/1981",
+  facebookId: "101479574003978"
 }
+let maxUser
 
 describe('User', () => {
 
@@ -59,7 +58,6 @@ describe('User', () => {
           })
 
         // Get test users from FB
-        let testUsers
         let testUsersUrl =
           config.constants.facebookBaseUrl +
           '/' + config.constants.facebookApiVersion +
@@ -71,10 +69,13 @@ describe('User', () => {
           })
 
         // request this app
-        let maxUser = {
-          email: "natking@finnesinyolady.com",
-          facebookId: testUsers[0].id,
-          facebookAuthToken: testUsers[0].access_token
+        let buddy = testUsers.find((user) => {
+          return user.id === buddyRich.facebookId
+        })
+        maxUser = {
+          email: buddyRich.email,
+          facebookId: buddy.id,
+          facebookAuthToken: buddy.access_token
         }
         testReq(server)
           .post(`${route}/login`)
@@ -84,16 +85,24 @@ describe('User', () => {
     })
   describe('Endpoint Tests', () => {
     describe('GET /user/me', () => {
-      it('should not get a user', () => {
+      it('should not get a user', (done) => {
         testReq(server)
           .get(`${route}/me`)
-          .expect(404)
+          .expect(401, done)
       })
       // TODO: figure out jwt validation with auth0
-      it('should get a user', () => {
+      it('should get a user', (done) => {
+        request
+          .post({
+            url: process.env.AUTH0_DOMAIN + config.constants.jwtEndpoint,
+            body: {
+              client_id: process.env.AU
+            }
+          })
+
         testReq(server)
           .get(`${route}/me`)
-          .expect()
+          .expect(200, done)
       })
     })
   })
