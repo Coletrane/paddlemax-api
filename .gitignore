@@ -39,6 +39,7 @@ node_modules
 
 test/fixtures-private.js
 
+.pgpass
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml

@@ -23,15 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     weightLbs: DataTypes.INTEGER,
     birthday: DataTypes.DATE,
     facebookId: DataTypes.STRING,
-    googleId: DataTypes.STRING,
-    createdAt: {
-      allowNull: false,
-      type: DataTypes.DATE
-    },
-    updatedAt: {
-      allowNull: false,
-      type: DataTypes.DATE
-    }
+    googleId: DataTypes.STRING
   })
 
   return User
