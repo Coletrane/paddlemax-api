@@ -1,6 +1,5 @@
-const jwt = require("express-jwt")
-const jwksRsa = require("jwks-rsa")
-
+const jwt = require('express-jwt')
+const jwksRsa = require('jwks-rsa')
 
 module.exports = jwt({
   secret: jwksRsa.expressJwtSecret({
@@ -12,6 +11,5 @@ module.exports = jwt({
 
   audience: process.env.AUTH0_AUDIENCE,
   issuer: `https://${process.env.AUTH0_DOMAIN}/`,
-  algorithms: ["RS256"]
+  algorithms: ['RS256']
 })
-

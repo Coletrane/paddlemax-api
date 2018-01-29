@@ -18,5 +18,5 @@ To test: create `test/fixtures-private.js` and put Auth0 test users in it
             }
     }
 
-
+To set up a File Watcher in IntelliJ/WebStorm: https://stackoverflow.com/questions/38883634/how-can-i-run-eslint-fix-on-my-javascript-in-intellij-idea-webstorm-other-je
     
