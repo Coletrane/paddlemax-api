@@ -38,4 +38,4 @@ node_modules
 
 .env
 
-test/test.config.js
+test/fixtures-private.js
