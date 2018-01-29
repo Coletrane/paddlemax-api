@@ -11,9 +11,9 @@ const readAndUpdate = jwtAuthz([
 ])
 
 router.post('/user/login', (req, res, next) => {
+  console.log(req.body)
   if (!req.body.email
   && (!req.body.facebookAuthToken) || (!req.body.googleAuthToken)) {
-    console.log("res")
     res.status(400).send("Email and access token are required")
   }
 

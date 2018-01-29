@@ -9,6 +9,7 @@ const jwt = require('express-jwt')
 const passport = require('passport')
 const FacebookTokenStrategy = require('passport-facebook-token')
 const models = require('./models')
+const Op = require('sequelize').Op
 
 // Config
 require("dotenv").config()
@@ -26,9 +27,19 @@ passport.use(new FacebookTokenStrategy({
   clientID: process.env.FACEBOOK_APP_ID,
   clientSecret: process.env.FACEBOOK_APP_SECRET
   }, (accessToken, refreshToken, profile, done) => {
-    models.User.findOrCreate({facebookId: profile.id}, (err, user) => {
-      return done(error, user)
+    let user = models.User.findAll({
+      where: {
+        [Op.or]: [
+          {
+            facebookId: profile.id
+          },
+          {
+            email: profile.email
+          }
+        ]
+      }
     })
+    return done(error, user)
   }
 ))
 app.use(passport.initialize())

@@ -2,22 +2,28 @@ const server = require('../server.js')
 const request = require('supertest')
 const user = require('../models/User')
 
-const testUserValid = {
-  facebookAuthToken: "123456789"
+const route = '/v1/user'
+const testFacebookUser = {
+
 }
 
 describe('User', () => {
   describe('Auth tests', () => {
       it('should be unauthorized', (done) => {
         request(server)
-          .get('/v1/user/me')
+          .get(`${route}/me`)
           .expect(401, done)
       })
       it('should be authorized', (done) => {
         request(server)
-          .post('/v1/user/login')
-          .send('user', JSON.stringify({email: "artblakey@finessinyolady.com"}))
+          .post(`${route}/login`)
+          .send({email: "artblakey@finessinyolady.com"})
           .expect(400, done)
+      })
+      it('should authorize with Facebook', (done) => {
+        request(server)
+          .post(`${route}/login`)
+          .send()
       })
     })
 })
