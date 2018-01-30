@@ -35,7 +35,7 @@ router.post('/user/login', (req, res, next) => {
             res.status(200)
             res.send(existingUser)
           }
-
+          console.log('FBUSER', fbUser)
           // prioritize properties sent to us over Facebook's
           const newUser = await User.create({
             firstName: req.body.firstName || fbUser.name.split(' ')[0],
@@ -77,11 +77,14 @@ const buildFacebookUrl = (user) => {
 }
 
 router.get('/user/me', config.jwt, async (req, res, next) => {
-  console.log(req)
+  if (!req.body.email) {
+    res.status(400)
+    res.send('Email is required')
+  }
 
   const user = await User.findOne({
     where: {
-      email: req.email
+      email: req.body.email
     }
   })
   if (user) {

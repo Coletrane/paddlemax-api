@@ -44,7 +44,7 @@ describe('User', () => {
         .expect(400, done)
     })
     // TODO: figure out location and birthday url params
-    xit('should authorize with Facebook', async () => {
+    it('should authorize with Facebook', async () => {
       // Get this App's auth token from FB
       let appToken
       let appTokenUrl =
@@ -81,7 +81,7 @@ describe('User', () => {
         facebookId: buddy.id,
         facebookAuthToken: buddy.access_token
       }
-      testReq(server)
+      return testReq(server)
         .post(`${route}/login`)
         .send(maxUser)
         .expect(200)
@@ -94,38 +94,31 @@ describe('User', () => {
           .get(`${route}/me`)
           .expect(401, done)
       })
-      it('should get a user', (done) => {
+      it('should get a user', async () => {
         let token
-        const strategy = new Auth0Strategy({
-          domain: process.env.AUTH0_DOMAIN,
-          clientID: process.env.AUTH0_TEST_CLIENT_ID,
-          clientSecret: process.env.AUTH0_TEST_CLIENT_SECRET,
-          callbackURL: '/'
-        }, async (accessToken, refreshToken, profile, authDone) => {
-          token = await accessToken
-          console.log('IN CALLBACK', token)
-          return authDone()
+        const options = {
+          method: 'POST',
+          url: `https://${process.env.AUTH0_DOMAIN}/oauth/token`,
+          headers: {'content-type': 'application/json'},
+          body: {
+            grant_type: 'client_credentials',
+            client_id: process.env.AUTH0_TEST_CLIENT_ID,
+            client_secret: process.env.AUTH0_TEST_CLIENT_SECRET,
+            audience: process.env.AUTH0_AUDIENCE
+          },
+          json: true
+        }
+        await request(options, (err, res, body) => {
+          if (!err) {
+            token = body.access_token
+          }
         })
-        passport.use(strategy)
-        server.use(passport.initialize())
-        server.use(passport.session())
-
-        passport.authenticate('auth0', {
-          clientID: process.env.AUTH0_TEST_CLIENT_ID,
-          domain: process.env.AUTH0_DOMAIN,
-          redirectUri: '/',
-          audience: `https://${process.env.AUTH0_DOMAIN}/userinfo`,
-          responseType: 'code',
-          scope: 'openid'
-        })
-        passport.authenticate('auth0', {
-          failureRedirect: '/'
-        })
-        console.log('OUTSIDE CALLBACK', token)
-
-        // testReq(server)
-        //   .get(`${route}/me`)
-        //   .expect(401, done)
+        // console.log(token)
+        return testReq(server)
+          .get(`${route}/me`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({email: buddyRich.email})
+          .expect(200)
       })
     })
   })
