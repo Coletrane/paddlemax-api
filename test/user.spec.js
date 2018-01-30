@@ -3,6 +3,7 @@ const testReq = require('supertest')
 const request = require('request-promise')
 const db = require('../models')
 const config = require('../config')
+const auth0 = require('auth0-js')
 require('dotenv').config()
 
 const route = '/v1/user'
@@ -92,28 +93,35 @@ describe('User', () => {
           .expect(401, done)
       })
       // TODO: figure out jwt validation with auth0
-      xit('should get a user', async (done) => {
-        const auth0Url =
-          'https://' +
-          process.env.AUTH0_DOMAIN +
-          config.constants.jwtEndpoint
-        console.log(auth0Url)
-        await request
-          .post({
-            url: auth0Url,
-            body: {
-              client_id: process.env.AUTH0_AUTHORIZED_CLIENT_ID,
-              client_secret: process.env.AUTH0_AUTHORIZED_CLIENT_SECRET,
-              audience: process.env.AUTH0_AUDIENCE,
-              grant_type: 'client_credentials'
-            },
-            json: true
-          }, (err, res, body) => {
-            if (!err) {
-              console.log(body)
-            }
-          })
-
+      it('should get a user', async (done) => {
+        console.log({
+          domain: process.env.AUTH0_DOMAIN,
+          clientID: process.env.AUTH0_TEST_CLIENT_ID,
+          responseType: 'token id_token',
+          audience: 'https://paddle-max.auth0.com/userinfo',
+          scope: 'openid',
+          redirectUri: '/'
+        })
+        const auth = new auth0.WebAuth({
+          domain: process.env.AUTH0_DOMAIN,
+          clientID: process.env.AUTH0_TEST_CLIENT_ID,
+          responseType: 'token id_token',
+          audience: `${process.env.AUTH0_AUDIENCE}/userinfo`,
+          scope: 'openid',
+          redirectUri: '/'
+        })
+        await auth.authorize()
+        auth.parseHash((err, authResult) => {
+          if (!err) {
+            console.log(authResult)
+          }
+        })
+        // eslint:disable
+        // function handleAuthentication() {
+        //   auth.parseHash((err, authResult) => {
+        //
+        //   })
+        // }
         testReq(server)
           .get(`${route}/me`)
           .expect(200, done)
