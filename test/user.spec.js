@@ -3,7 +3,9 @@ const testReq = require('supertest')
 const request = require('request-promise')
 const db = require('../models')
 const config = require('../config')
-const auth0 = require('auth0-js')
+const passport = require('passport')
+const Auth0Strategy = require('passport-auth0')
+
 require('dotenv').config()
 
 const route = '/v1/user'
@@ -92,39 +94,38 @@ describe('User', () => {
           .get(`${route}/me`)
           .expect(401, done)
       })
-      // TODO: figure out jwt validation with auth0
-      it('should get a user', async (done) => {
-        console.log({
+      it('should get a user', (done) => {
+        let token
+        const strategy = new Auth0Strategy({
           domain: process.env.AUTH0_DOMAIN,
           clientID: process.env.AUTH0_TEST_CLIENT_ID,
-          responseType: 'token id_token',
-          audience: 'https://paddle-max.auth0.com/userinfo',
-          scope: 'openid',
-          redirectUri: '/'
+          clientSecret: process.env.AUTH0_TEST_CLIENT_SECRET,
+          callbackURL: '/'
+        }, async (accessToken, refreshToken, profile, authDone) => {
+          token = await accessToken
+          console.log('IN CALLBACK', token)
+          return authDone()
         })
-        const auth = new auth0.WebAuth({
-          domain: process.env.AUTH0_DOMAIN,
+        passport.use(strategy)
+        server.use(passport.initialize())
+        server.use(passport.session())
+
+        passport.authenticate('auth0', {
           clientID: process.env.AUTH0_TEST_CLIENT_ID,
-          responseType: 'token id_token',
-          audience: `${process.env.AUTH0_AUDIENCE}/userinfo`,
-          scope: 'openid',
-          redirectUri: '/'
+          domain: process.env.AUTH0_DOMAIN,
+          redirectUri: '/',
+          audience: `https://${process.env.AUTH0_DOMAIN}/userinfo`,
+          responseType: 'code',
+          scope: 'openid'
         })
-        await auth.authorize()
-        auth.parseHash((err, authResult) => {
-          if (!err) {
-            console.log(authResult)
-          }
+        passport.authenticate('auth0', {
+          failureRedirect: '/'
         })
-        // eslint:disable
-        // function handleAuthentication() {
-        //   auth.parseHash((err, authResult) => {
-        //
-        //   })
-        // }
-        testReq(server)
-          .get(`${route}/me`)
-          .expect(200, done)
+        console.log('OUTSIDE CALLBACK', token)
+
+        // testReq(server)
+        //   .get(`${route}/me`)
+        //   .expect(401, done)
       })
     })
   })
