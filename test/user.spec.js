@@ -3,6 +3,9 @@ const testReq = require('supertest')
 const request = require('request-promise')
 const db = require('../models')
 const config = require('../config')
+const passport = require('passport')
+const Auth0Strategy = require('passport-auth0')
+
 require('dotenv').config()
 
 const route = '/v1/user'
@@ -41,7 +44,7 @@ describe('User', () => {
         .expect(400, done)
     })
     // TODO: figure out location and birthday url params
-    xit('should authorize with Facebook', async () => {
+    it('should authorize with Facebook', async () => {
       // Get this App's auth token from FB
       let appToken
       let appTokenUrl =
@@ -78,7 +81,7 @@ describe('User', () => {
         facebookId: buddy.id,
         facebookAuthToken: buddy.access_token
       }
-      testReq(server)
+      return testReq(server)
         .post(`${route}/login`)
         .send(maxUser)
         .expect(200)
@@ -91,32 +94,31 @@ describe('User', () => {
           .get(`${route}/me`)
           .expect(401, done)
       })
-      // TODO: figure out jwt validation with auth0
-      xit('should get a user', async (done) => {
-        const auth0Url =
-          'https://' +
-          process.env.AUTH0_DOMAIN +
-          config.constants.jwtEndpoint
-        console.log(auth0Url)
-        await request
-          .post({
-            url: auth0Url,
-            body: {
-              client_id: process.env.AUTH0_AUTHORIZED_CLIENT_ID,
-              client_secret: process.env.AUTH0_AUTHORIZED_CLIENT_SECRET,
-              audience: process.env.AUTH0_AUDIENCE,
-              grant_type: 'client_credentials'
-            },
-            json: true
-          }, (err, res, body) => {
-            if (!err) {
-              console.log(body)
-            }
-          })
-
-        testReq(server)
+      it('should get a user', async () => {
+        let token
+        const options = {
+          method: 'POST',
+          url: `https://${process.env.AUTH0_DOMAIN}/oauth/token`,
+          headers: {'content-type': 'application/json'},
+          body: {
+            grant_type: 'client_credentials',
+            client_id: process.env.AUTH0_TEST_CLIENT_ID,
+            client_secret: process.env.AUTH0_TEST_CLIENT_SECRET,
+            audience: process.env.AUTH0_AUDIENCE
+          },
+          json: true
+        }
+        await request(options, (err, res, body) => {
+          if (!err) {
+            token = body.access_token
+          }
+        })
+        // console.log(token)
+        return testReq(server)
           .get(`${route}/me`)
-          .expect(200, done)
+          .set('Authorization', `Bearer ${token}`)
+          .send({email: buddyRich.email})
+          .expect(200)
       })
     })
   })
