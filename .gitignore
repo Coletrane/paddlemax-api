@@ -38,6 +38,7 @@ node_modules
 .env
 
 test/fixtures-private.js
+.idea/workspace.xml
 
 .pgpass
 # Elastic Beanstalk Files
