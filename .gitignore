@@ -39,6 +39,7 @@ node_modules
 
 test/fixtures-private.js
 .idea/workspace.xml
+db.development.sqlite
 
 .pgpass
 # Elastic Beanstalk Files

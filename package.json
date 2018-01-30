@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "NODE_ENV=production node ./server.js",
-    "test": "NODE_ENV=test mocha --require should --reporter spec --check-leaks --timeout 10000 --exit",
+    "test": "NODE_ENV=test mocha --require chai --reporter spec --check-leaks --timeout 10000 --exit",
     "lint": "eslint --fix ./"
   },
   "repository": {
@@ -28,6 +28,7 @@
     "express-jwt-authz": "^1.0.0",
     "jwks-rsa": "^1.2.1",
     "lodash": "^4.17.4",
+    "moment": "^2.20.1",
     "passport-facebook-token": "^3.3.0",
     "pg": "^7.4.1",
     "request": "^2.83.0",

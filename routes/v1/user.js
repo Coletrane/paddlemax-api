@@ -3,12 +3,7 @@ const config = require('../../config')
 const request = require('request-promise')
 const User = require('../../models').User
 
-// TODO: might not need this
-// const readAndUpdate = jwtAuthz([
-//   "read:user",
-//   "update:user"
-// ])
-
+// Endpoints
 router.post('/user/login', (req, res, next) => {
   if (!req.body.email) {
     res.status(400)
@@ -35,7 +30,7 @@ router.post('/user/login', (req, res, next) => {
             res.status(200)
             res.send(existingUser)
           }
-          console.log('FBUSER', fbUser)
+
           // prioritize properties sent to us over Facebook's
           const newUser = await User.create({
             firstName: req.body.firstName || fbUser.name.split(' ')[0],
@@ -62,6 +57,43 @@ router.post('/user/login', (req, res, next) => {
   }
 })
 
+router.get('/user/me', config.jwt, async (req, res, next) => {
+  // console.log('WEight lbs', req.body)
+  if (!req.body.email) {
+    res.status(400)
+    res.send('Email is required')
+  }
+
+  getUser(req, res, next)
+})
+
+router.patch('/user', config.jwt, async (req, res, next) => {
+  if (!req.body.email) {
+    res.status(400)
+    res.send('Email is required')
+  }
+
+  await User.upsert(req.body)
+  getUser(req, res, next)
+})
+
+// Methods
+const getUser = async (req, res, next) => {
+  const user = await User.findOne({
+    where: {
+      email: req.body.email
+    }
+  })
+
+  if (user) {
+    res.status(200)
+    res.send(user)
+  } else {
+    res.status(404)
+    res.send()
+  }
+}
+
 const buildFacebookUrl = (user) => {
   let url = `${config.constants.facebookBaseUrl}/me?fields=id,name`
 
@@ -75,38 +107,5 @@ const buildFacebookUrl = (user) => {
 
   return url
 }
-
-router.get('/user/me', config.jwt, async (req, res, next) => {
-  if (!req.body.email) {
-    res.status(400)
-    res.send('Email is required')
-  }
-
-  const user = await User.findOne({
-    where: {
-      email: req.body.email
-    }
-  })
-  if (user) {
-    res.status(200)
-    res.send(user)
-  } else {
-    res.status(404)
-    res.send()
-  }
-})
-
-router.patch('/user', config.jwt, async (req, res, next) => {
-  if (!req.body.email) {
-    res.status(400)
-    res.send('Email is required')
-  }
-
-  const user = await User.upsert(req.body)
-  if (user) {
-    res.status(200)
-    res.send(user)
-  }
-})
 
 module.exports = router
